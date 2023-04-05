@@ -1,0 +1,30 @@
+import pandas as pd
+import numpy as np
+df = pd.read_csv('data1.csv')
+s = df[["STATE", "FIRE_SIZE_CLASS"]]
+df_new = pd.get_dummies(s)
+
+X = df_new.iloc[:, 0:52]
+y = df_new.iloc[:, 52]
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 99)
+
+from sklearn.ensemble import RandomForestClassifier
+clf = RandomForestClassifier(criterion = "gini",
+                            max_depth = 8,
+                            min_samples_split = 10,
+                            random_state = 5)
+
+clf.fit(X_train, y_train)
+clf.feature_importances_
+
+features = df_new.columns
+imp = clf.feature_importances_
+indices = np.argsort(imp)
+
+plt.title("Feature Importance when Fire Size is A")
+plt.barh(range(len(indices)), imp[indices], color = 'b', align = "center")
+plt.yticks(range(len(indices)), [features[i] for i in indices], fontsize = 5)
+plt.xlabel("Relative Importance")
+plt.show()
